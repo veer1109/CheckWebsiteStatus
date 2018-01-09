@@ -47,6 +47,8 @@ namespace CheckWebsiteStatus
                     }
                     w.WriteLine("------------------------------------------");   
                 }
+
+
             string Status = Convert.ToString(ConfigurationManager.AppSettings["MailRequest"]);
             if (Status == "true" || ErrorStatus==1)
             {
