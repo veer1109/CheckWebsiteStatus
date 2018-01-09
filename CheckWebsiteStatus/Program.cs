@@ -16,21 +16,14 @@ namespace CheckWebsiteStatus
 
         public static ArrayList chkurl = new ArrayList();
         public static ArrayList WebStatus = new ArrayList();
-
+       public static List<string> WebURL = new List<string>();
+    
         static void Main(string[] args)
         {
-            chkurl.Add("https://web1.villaplus.com");
-            chkurl.Add("https://web2.villaplus.com");
-            chkurl.Add("https://t1.villaplus.com");
-            chkurl.Add("https://t2.villaplus.com");
-            chkurl.Add("https://m1.villaplus.com");
-            chkurl.Add("https://m2.villaplus.com");
-            chkurl.Add("https://www.villaplus.com");
-            chkurl.Add("https://t.villaplus.com");
-            chkurl.Add("https://m.villaplus.com");
+            WebURL = Convert.ToString(ConfigurationManager.AppSettings["weburl"]).Split(',').ToList();
 
-
-            foreach (string url in chkurl)
+           // Console.Write("The list element" + WebURL.Count);
+            foreach (string url in WebURL)
             {
                 string status = CheckStatus(url);
 
@@ -38,13 +31,13 @@ namespace CheckWebsiteStatus
                // Console.WriteLine(status);
             }
 
-            for(int i=0; i < chkurl.Count;i++)
+            for(int i=0; i < WebURL.Count;i++)
             {
-                Console.WriteLine("URL: " + chkurl[i] + "Status: " + WebStatus[i]);
+                Console.WriteLine("URL: " + WebURL[i] + "Status: " + WebStatus[i]);
             }
 
-            SendMail();
-            Console.ReadLine();
+           SendMail();
+            //Console.ReadLine();
 
         }
 
@@ -54,7 +47,7 @@ namespace CheckWebsiteStatus
             HttpWebResponse response;
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(uri.Uri);
             request.AllowAutoRedirect = false;
-            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+           ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
             try
             {
                 response = (HttpWebResponse)request.GetResponse();
@@ -76,9 +69,34 @@ namespace CheckWebsiteStatus
                     Console.WriteLine(i);
                     return response.StatusCode.ToString();
                 }
-                
-               
-               
+                else if (i == 400)
+                {
+                    Console.WriteLine(i);
+                    return response.StatusCode.ToString();
+                }
+                else if (i == 401)
+                {
+                    Console.WriteLine(i);
+                    return response.StatusCode.ToString();
+                }
+                else if (i == 403)
+                {
+                    Console.WriteLine(i);
+                    return response.StatusCode.ToString();
+                }
+                else if (i == 405)
+                {
+                    Console.WriteLine(i);
+                    return response.StatusCode.ToString();
+                }
+                else if (i == 500)
+                {
+                    Console.WriteLine(i);
+                    return response.StatusCode.ToString();
+                }
+
+
+
             }
             catch (System.Net.WebException ex)
             {
@@ -114,12 +132,12 @@ namespace CheckWebsiteStatus
             myBuilder.Append("Status");
            
            
-            for (int i =0; i < chkurl.Count;i++)
+            for (int i =0; i < WebURL.Count;i++)
             {
                 
                     myBuilder.Append("</tr>");
                     myBuilder.Append("<td align='left' valign='top' style='border: solid 1px black;'>");
-                    myBuilder.Append(chkurl[i].ToString());
+                    myBuilder.Append(WebURL[i].ToString());
                     myBuilder.Append("</td>");
                     myBuilder.Append("<td align='left' valign='top' style='border: solid 1px black;'>");
                     myBuilder.Append(WebStatus[i].ToString());
