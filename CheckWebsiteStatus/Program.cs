@@ -7,16 +7,18 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Configuration;
 using System.Net.Mail;
+using System.IO;
 
 namespace CheckWebsiteStatus
 {
     class Program
     {
 
-
+       // private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         public static ArrayList chkurl = new ArrayList();
         public static ArrayList WebStatus = new ArrayList();
        public static List<string> WebURL = new List<string>();
+        public static int ErrorStatus;
     
         static void Main(string[] args)
         {
@@ -31,12 +33,25 @@ namespace CheckWebsiteStatus
                // Console.WriteLine(status);
             }
 
-            for(int i=0; i < WebURL.Count;i++)
+                using (StreamWriter w = File.AppendText("log.txt"))
+                {
+                    w.Write("\r\nLog Entry : ");
+                    w.WriteLine("{0} {1}", DateTime.Now.ToLongTimeString(),DateTime.Now.ToLongDateString());
+                    w.WriteLine("------------------------------------------");
+                    w.WriteLine("Website                             Status");
+                    w.WriteLine("------------------------------------------");
+                for (int i = 0; i < WebURL.Count; i++)
+                    {
+                    Log(WebURL[i] + "    " + WebStatus[i], w);
+                    Console.WriteLine("URL: " + WebURL[i] + "Status: " + WebStatus[i]);
+                    }
+                    w.WriteLine("------------------------------------------");   
+                }
+            string Status = Convert.ToString(ConfigurationManager.AppSettings["MailRequest"]);
+            if (Status == "true" || ErrorStatus==1)
             {
-                Console.WriteLine("URL: " + WebURL[i] + "Status: " + WebStatus[i]);
+                SendMail();
             }
-
-           SendMail();
             //Console.ReadLine();
 
         }
@@ -100,13 +115,10 @@ namespace CheckWebsiteStatus
             }
             catch (System.Net.WebException ex)
             {
-                if (ex.Status == WebExceptionStatus.ProtocolError)
-                {
-                    Console.WriteLine(ex.Message);
-                    return ex.Message.ToString();
-
-                }
-
+                  Console.WriteLine(ex.Message);
+                    ErrorStatus = 1;
+                  return ex.Message.ToString();
+               
             }
             return "NoStatus";
 
@@ -182,12 +194,20 @@ namespace CheckWebsiteStatus
             }
             MailAddress from = new MailAddress(Emailfrom);
             mail.Subject = Convert.ToString(ConfigurationManager.AppSettings["subject"]);
+           
             mail.Body = BuildMessage();
             mail.IsBodyHtml = true;
             mail.From = from;
-
             client.Send(mail);
             // Console.ReadLine();
+        }
+
+
+        public static void Log(string logMessage, TextWriter w)
+        {
+            
+            w.WriteLine("{0}", logMessage);
+          
         }
     }
 }
